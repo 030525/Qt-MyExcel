@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>resouce/addFile.ico</file>
+        <file>resouce/save.png</file>
+        <file>resouce/open.png</file>
+        <file>resouce/cut.webp</file>
+        <file>resouce/copy.webp</file>
+        <file>resouce/paste.webp</file>
+        <file>resouce/sort.jpg</file>
+        <file>resouce/find.png</file>
+        <file>resouce/table.jpg</file>
+    </qresource>
+</RCC>

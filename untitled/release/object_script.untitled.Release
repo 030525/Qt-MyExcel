@@ -1,0 +1,10 @@
+release/finddialog.o
+release/gotowidget.o
+release/main.o
+release/mainwindow.o
+release/tableset.o
+release/qrc_img.o
+release/moc_finddialog.o
+release/moc_gotowidget.o
+release/moc_mainwindow.o
+release/moc_tableset.o
