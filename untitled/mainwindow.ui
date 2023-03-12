@@ -129,6 +129,15 @@
              <string>字体</string>
             </property>
             <layout class="QGridLayout" name="gridLayout">
+             <item row="0" column="0" colspan="3">
+              <widget class="QFontComboBox" name="fontComboBox">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+              </widget>
+             </item>
              <item row="2" column="2">
               <widget class="QPushButton" name="pushButton_3">
                <property name="minimumSize">
@@ -192,39 +201,6 @@
                </property>
                <property name="checkable">
                 <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0" colspan="3">
-              <widget class="QPushButton" name="pushButton_5">
-               <property name="font">
-                <font>
-                 <pointsize>14</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string>单元格颜色</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0" colspan="3">
-              <widget class="QPushButton" name="pushButton_4">
-               <property name="font">
-                <font>
-                 <pointsize>14</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string>文字颜色</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0" colspan="3">
-              <widget class="QFontComboBox" name="fontComboBox">
-               <property name="font">
-                <font>
-                 <pointsize>12</pointsize>
-                </font>
                </property>
               </widget>
              </item>
@@ -417,7 +393,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="sort"/>
+   <addaction name="actionSort"/>
    <addaction name="actionFind"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -552,7 +528,10 @@
     <string>Recent file</string>
    </property>
   </action>
-  <action name="sort">
+  <action name="actionSort">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="img.qrc">
      <normaloff>:/new/prefix1/resouce/sort.jpg</normaloff>:/new/prefix1/resouce/sort.jpg</iconset>

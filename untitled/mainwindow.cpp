@@ -5,17 +5,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-
-    time = new QTimer();
-
-    connect(time,&QTimer::timeout,this,&MainWindow::ColorDebug);
-
-    time->start(1000);
-
-
      ui->setupUi(this);
-     Item* item = new Item();
-     ui->tableWidget->setItemPrototype(item);
 
      this->move(400,100);
      Start();
@@ -28,18 +18,6 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-
-void MainWindow::ColorDebug()
-{
-    Item * item = dynamic_cast<Item*> (ui->tableWidget->item(0,0));
-    if(item != nullptr)
-    {
-        qDebug() << item->getTextColor().red() << item->getTextColor().green() << item->getTextColor().blue();
-        qDebug() << item->getbackgroundColor().red() << item->getbackgroundColor().green() << item->getbackgroundColor().blue();
-    }
-}
-
-
 
 void MainWindow::isChanged()
 {
@@ -110,24 +88,18 @@ bool MainWindow::write_file(QString filename)
 
     //quint i,j;
     int itemNum = 0;
-    QColor t,b;
 
     for(int i = 0;i < row;i++)
     {
         for(int j = 0;j < col;j++)
         {
             //out << i << j << get_ItemString(i,j);
-            auto item1 = ui->tableWidget->item(i,j);
-            Item *item = dynamic_cast<Item*>(item1);
+            auto item = ui->tableWidget->item(i,j);
 
             if(item != nullptr)
             {
-                t = item->getTextColor();
-                b = item->getbackgroundColor();
-                qDebug() << item->getTextColor();
-                out << i << j << item->text() << item->getFont() << QColor(t.red(),t.green(),t.blue(),t.alpha()) << QColor(b.red(),b.green(),b.blue(),b.alpha());
 
-                qDebug() << item->getTextColor().name() << item->getbackgroundColor().name();
+                out << i << j << item->text() << item->font();
                 itemNum++;
             }
         }
@@ -229,7 +201,7 @@ void MainWindow::on_actionGoto_triggered()
     g->show();
 }
 
-void MainWindow::Cut(void (MainWindow::*dosome)(Item *))
+void MainWindow::Cut(void (MainWindow::*dosome)(QTableWidgetItem *))
 {
 
     QString str = "";
@@ -242,8 +214,7 @@ void MainWindow::Cut(void (MainWindow::*dosome)(Item *))
     {
         for(int j = list[0].leftColumn();j <= list[0].rightColumn();j++)
         {
-            QTableWidgetItem *item1 = ui->tableWidget->item(i,j);
-            Item * item = dynamic_cast<Item*>(item1);
+            QTableWidgetItem *item = ui->tableWidget->item(i,j);
             if(item)
             {
                 str += item->text();
@@ -293,15 +264,14 @@ void MainWindow::Paste()
             {
                 if(j+cCol < Col)
                 {
-                    QTableWidgetItem *item1 = ui->tableWidget->item(i+cRow,j+cCol);
-                    Item *item = dynamic_cast<Item*>(item1);
+                    QTableWidgetItem *item = ui->tableWidget->item(i+cRow,j+cCol);
                     if(item)
                     {
                         item->setText(itemlist[j]);
                     }
                     else
                     {
-                        item = new Item(itemlist[j]);
+                        item = new QTableWidgetItem(itemlist[j]);
                         ui->tableWidget->setItem(i+cRow,j+cCol,item);
                     }
                 }
@@ -317,7 +287,7 @@ void MainWindow::Paste()
     ui->tableWidget->setRangeSelected(QTableWidgetSelectionRange(cRow,cCol,sRow-1,sCol-1),true);
 }
 
-void MainWindow::deleteItem(Item *item)
+void MainWindow::deleteItem(QTableWidgetItem *item)
 {
     delete item;
     qDebug() << "delete item";
@@ -393,8 +363,76 @@ void MainWindow::on_actionCol_triggered()
 void MainWindow::on_actionAll_triggered()
 {
 
-      ui->tableWidget->selectAll();
+    ui->tableWidget->selectAll();
 }
+
+void MainWindow::on_actionSort_triggered(bool key)
+{
+    QList<QTableWidgetSelectionRange> range = ui->tableWidget->selectedRanges();
+    if(range.size() == 0)
+    {
+        set_statusBar("您未选择任意一个单元格");
+        return;
+    }
+    else if(range[0].leftColumn() != range[0].rightColumn())
+    {
+        set_statusBar("不能一次选择多列排序");
+        return;
+    }
+
+    int column = range[0].leftColumn();
+    QVector<QVector<QString>> v;
+    QVector<QString> l;
+
+    for(int i = 0;i < ui->tableWidget->rowCount();i++)
+    {
+        for(int j = 0;j < ui->tableWidget->columnCount();j++)
+        {
+            QTableWidgetItem * item = ui->tableWidget->item(i,j);
+            if(item)
+            {
+                l.push_back(item->text());
+            }
+            else l.push_back("");
+        }
+        v.push_back(l);
+        l.clear();
+    }
+    if(key == true)
+    {
+        //升序
+        std::sort(v.begin(),v.end(),[&](const QVector<QString> &a,const QVector<QString> & b){
+            return a[column] < b[column];
+        });
+        set_statusBar("升序");
+    }
+    else
+    {
+        std::sort(v.begin(),v.end(),[&](const QVector<QString> &a,const QVector<QString> & b){
+            return a[column] > b[column];
+        });
+        set_statusBar("降序");
+        //降序
+    }
+
+    for(int i = 0;i < ui->tableWidget->rowCount();i++)
+    {
+        for(int j = 0;j < ui->tableWidget->columnCount();j++)
+        {
+            if(v[i][j] != "")
+            {
+
+                QTableWidgetItem * item = ui->tableWidget->item(i,j);
+                if(item == nullptr)
+                {
+                    item = new QTableWidgetItem(v[i][j]);
+                }
+                else item->setText(v[i][j]);
+            }
+        }
+    }
+}
+
 bool MainWindow::read_file(QString filename)
 {
     QFile file(filename);
@@ -428,7 +466,8 @@ bool MainWindow::read_file(QString filename)
     //开始设置表格行列数，并导入文件数据
     set_table(row,col);
     QFont f;
-    QColor t,b;
+    QString t,b;
+    QColor t1,b1;
     int itemNum = 0;
     while(!in.atEnd())
     {
@@ -436,7 +475,9 @@ bool MainWindow::read_file(QString filename)
         in >> row >> col >> str >> f >> t >> b;
 
         //添加数据项
-        set_Item(row,col,str,f,t,b);
+        t1.setNamedColor(t);
+        b1.setNamedColor(b);
+        set_Item(row,col,str,f,t1,b1);
         itemNum++;
     }
     qDebug() << "read out " << itemNum << "  items ";
@@ -550,13 +591,13 @@ bool MainWindow::find_forward(QString text, bool match_case)
     return false;
 }
 
-Item* MainWindow::oneItemSelected()
+QTableWidgetItem* MainWindow::oneItemSelected()
 {
     QList<QTableWidgetItem*> list = ui->tableWidget->selectedItems();
 
     if(list.size() == 0 || list.size() > 1) return nullptr;
 
-    return dynamic_cast<Item*>(list[0]);
+    return (list[0]);
 }
 
 void MainWindow::getFindSIGNAL(int row, int col)
@@ -844,7 +885,6 @@ void MainWindow::set_table(int row, int col)
     //回收方阵以外的内存
     recycle_ItemMemory(big_row,big_col,row,col);
 
-
     ui->tableWidget->setRowCount(row);
     ui->tableWidget->setColumnCount(col);
 
@@ -855,16 +895,16 @@ void MainWindow::set_table(int row, int col)
 
 void MainWindow::clearItem(int i,int j)
 {
-    QTableWidgetItem *item1 = ui->tableWidget->item(i,j);
-    Item *item = dynamic_cast<Item*>(item1);
+    QTableWidgetItem *item = ui->tableWidget->item(i,j);
 
     if(item)
     {
+        qDebug() << "clear" << i << " , " << j;
         item->setText("");
         item->setBackground(QColor(Qt::white));
+        item->setForeground(QColor(Qt::black));
     }
 
-    QPalette p;
 
 }
 
@@ -969,18 +1009,17 @@ void MainWindow::set_Item(int row, int col,const QString & s,const QFont &f,cons
 {
     //注意数据项的函数是item
     //不是itemAt
-    QTableWidgetItem *item1 = ui->tableWidget->item(row,col);
-    Item *item = dynamic_cast<Item*>(item1);
+    QTableWidgetItem *item = ui->tableWidget->item(row,col);
 
     if(item == nullptr)
     {
-        item = new Item();
+        item = new QTableWidgetItem();
 
         ui->tableWidget->setItem(row,col,item);
     }
 
     item->setText(s);
-    item->Set(f,textcolor,backgourndcolor);
+    item->setFont(f);
 }
 
 
@@ -1098,71 +1137,4 @@ void MainWindow::get_changeFont(const QFont &f)
     ui->pushButton_2->setChecked(f.italic());
     ui->pushButton_3->setChecked(f.underline());
 }
-
-
-void MainWindow::on_pushButton_4_clicked()
-{
-    QColor c = QColorDialog::getColor(Q_NULLPTR);
-    qDebug() << "text color " << c;
-
-
-    QList<QTableWidgetSelectionRange> list = ui->tableWidget->selectedRanges();
-     if(list.size() == 0) return;
-
-    for(int i = list[0].topRow();i <= list[0].bottomRow();i++)
-    {
-        for(int j = list[0].leftColumn();j <= list[0].rightColumn();j++)
-        {
-            Item * item = dynamic_cast<Item*>(ui->tableWidget->item(i,j));
-            if(item == nullptr)
-            {
-                item = new Item();
-                ui->tableWidget->setItem(i,j,item);
-            }
-            item->setForeground(c);
-        }
-    }
-
-
-    //解除选中
-    ui->tableWidget->clearSelection();
-
-}
-
-
-
-void MainWindow::on_pushButton_5_clicked()
-{
-
-
-
-    QList<QTableWidgetSelectionRange> list = ui->tableWidget->selectedRanges();
-
-    QColor c = QColorDialog::getColor(Q_NULLPTR);
-    qDebug() << c.red() << c.green() << c.blue();
-    qDebug() << "text color " << c;
-
-    qDebug() << list[0].topRow() << list[0].bottomRow() << list[0].leftColumn() << list[0].rightColumn();
-    if(list.size() == 0) return;
-
-    for(int i = list[0].topRow();i <= list[0].bottomRow();i++)
-    {
-        for(int j = list[0].leftColumn();j <= list[0].rightColumn();j++)
-        {
-            Item * item = dynamic_cast<Item*>(ui->tableWidget->item(i,j));
-            if(item == nullptr)
-            {
-                item = new Item();
-                ui->tableWidget->setItem(i,j,item);
-            }
-            item->setBackground(c);
-        }
-    }
-
-
-    //解除选中
-    ui->tableWidget->clearSelection();
-}
-
-
 

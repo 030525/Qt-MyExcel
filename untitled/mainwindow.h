@@ -16,18 +16,16 @@
 
 #include <QDebug>
 #include <QMessageBox>
-#include <QColorDialog>
 #include <QApplication>
 #include <QClipboard>
 #include <QFont>
-#include <QColor>
+
 
 #include <QTimer>
 
 
 #include "tableset.h"
 #include "finddialog.h"
-#include "item.h"
 #include "gotowidget.h"
 
 QT_BEGIN_NAMESPACE
@@ -52,7 +50,6 @@ public:
     //窗口
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void ColorDebug();
 
 private:
     void start_file();
@@ -114,10 +111,12 @@ private slots://edit菜单
     void on_actionCol_triggered();
     void on_actionAll_triggered();
 
+    void on_actionSort_triggered(bool key);
+
 private:
-    void Cut(void (MainWindow::*dosome)(Item*));
+    void Cut(void (MainWindow::*dosome)(QTableWidgetItem*));
     void Paste();
-    void deleteItem(Item*item);
+    void deleteItem(QTableWidgetItem*item);
 
 private://按键
     void keyPressEvent(QKeyEvent *event);
@@ -153,9 +152,8 @@ private slots:
     void on_tableWidget_itemSelectionChanged();
     void get_changeFont(const QFont & f);
 
-    //color
-    void on_pushButton_4_clicked();//text
-    void on_pushButton_5_clicked();//background
+
+
 
 private:
     //ui设置
@@ -194,7 +192,7 @@ private:
 
 
     //单元格
-    Item* oneItemSelected();
+    QTableWidgetItem* oneItemSelected();
     void clearItem(int k,int m);
 
     bool get_nextItem(int &row,int &col);
