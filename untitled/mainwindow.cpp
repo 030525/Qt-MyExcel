@@ -19,26 +19,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::ColorDebug()
-{
-    for(int i = 0;i < ui->tableWidget->rowCount();i++)
-    {
-        for(int j = 0;j < ui->tableWidget->columnCount();j++)
-        {
-            QTableWidgetItem * item = ui->tableWidget->item(i,j);
-            if(item != nullptr)
-            {
-                qDebug() << "( " << i << " , " << j <<  " )"
-                         << item->foreground().color().name()
-                         << item->background().color().name();
-            }
-        }
-    }
-
-}
-
-
-
 void MainWindow::isChanged()
 {
     this->setWindowTitle(tr("文件未更新[*]"));
@@ -1158,13 +1138,3 @@ void MainWindow::get_changeFont(const QFont &f)
     ui->pushButton_3->setChecked(f.underline());
 }
 
-void MainWindow::on_pushButton_6_clicked()
-{
-    for(int i = 0;i < ui->tableWidget->rowCount();i++)
-    {
-        for(int j = 0;j < ui->tableWidget->columnCount();j++)
-        {
-            qDebug() << i << " , " << j ;
-        }
-    }
-}

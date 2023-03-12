@@ -50,7 +50,6 @@ public:
     //窗口
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void ColorDebug();
 
 private:
     void start_file();
@@ -154,7 +153,7 @@ private slots:
     void get_changeFont(const QFont & f);
 
 
-    void on_pushButton_6_clicked();
+
 
 private:
     //ui设置
