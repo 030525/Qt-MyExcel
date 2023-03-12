@@ -14,7 +14,6 @@ CONFIG += c++17
 SOURCES += \
     finddialog.cpp \
     gotowidget.cpp \
-    item.cpp \
     main.cpp \
     mainwindow.cpp \
     tableset.cpp
@@ -22,7 +21,6 @@ SOURCES += \
 HEADERS += \
     finddialog.h \
     gotowidget.h \
-    item.h \
     mainwindow.h \
     tableset.h
 

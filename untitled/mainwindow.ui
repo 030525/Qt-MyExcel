@@ -258,6 +258,13 @@
             </layout>
            </widget>
           </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="pushButton_6">
+            <property name="text">
+             <string>exist</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
         <widget class="QWidget" name="tab_2">
@@ -417,7 +424,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="sort"/>
+   <addaction name="actionSort"/>
    <addaction name="actionFind"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -552,7 +559,10 @@
     <string>Recent file</string>
    </property>
   </action>
-  <action name="sort">
+  <action name="actionSort">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="img.qrc">
      <normaloff>:/new/prefix1/resouce/sort.jpg</normaloff>:/new/prefix1/resouce/sort.jpg</iconset>
